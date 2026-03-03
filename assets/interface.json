@@ -4,36 +4,33 @@
     // 文档：https://maafw.xyz/docs/3.3-ProjectInterfaceV2
     // 示例：https://github.com/MaaXYZ/MaaFramework/blob/main/sample/interface.json
     "interface_version": 2,
-    "name": "MaaXXX",
-    "description": "这是一个使用 MaaFramework 创建的新项目。",
-    "contact": "QQ群: 123456789",
+    "name": "铃兰之剑maa",
+    "description": "桌面版铃兰之剑自动化脚本，包含进入游戏、处理公告、好友领取等功能。",
+    "contact": "无",
     "license": "MIT",
-    "welcome": "首次使用！欢迎使用 MAA!",
+    "welcome": "首次使用请确保游戏窗口已打开，并配置好窗口匹配规则",
     // 填写项目地址和版本号可实现自动更新功能
-    "github": "https://github.com/MaaXYZ/MaaPracticeBoilerplate",
-    "version": "1.0.0",
+    "github": "https://github.com/fzlxs/-maa.git",
+    "version": "1.0.1",
     // Mirror酱为第三方分发服务，新项目默认关闭
     // 若有需要请联系 Mirror酱 开通，直接自行开启是无法使用的
     // "mirrorchyan_rid": "MaaXXX",
     // "mirrorchyan_multiplatform": true,
     "controller": [
         {
-            "name": "安卓端",
-            "type": "Adb",
-            "display_short_side": 720 // 默认缩放分辨率的短边长度
-        },
-        {
             "name": "桌面端",
             "type": "Win32",
             "win32": {
-                "class_regex": ".*",
-                "window_regex": "Visual Studio",
+                "window_regex": "铃兰之剑", // 替换为你的游戏窗口标题（支持正则）
+                "class_regex": "UnityWndClass", // 替换为窗口类名（通常游戏是 UnityWndClass）
+                // 控制方式可根据需要调整，以下为常用组合
                 // 截图及控制方式，请根据项目实际情况修改
                 // 文档: https://maafw.xyz/docs/2.4-ControlMethods
-                "screencap": "PrintWindow", // 截图方式
-                "mouse": "PostMessageWithCursorPos", // 鼠标控制方式
-                "keyboard": "PostMessageWithCursorPos" // 键盘控制方式
-            }
+                "screencap": "FramePool", // 截图方式
+                "mouse": "Seize", // 鼠标控制方式
+                "keyboard": "Seize" // 键盘控制方式
+            },
+            "display_short_side": 720 // 截图缩放尺寸，保持 720p 即可
         }
     ],
     "resource": [
@@ -41,14 +38,7 @@
             "name": "官服",
             "path": [
                 "./resource"
-            ]
-        },
-        {
-            "name": "B 服",
-            "path": [
-                "./resource",
-                "./resource_bilibili"
-            ]
+            ] // 或者直接 "resource" 也可
         }
     ],
     // 可选的 agent 示例
@@ -60,50 +50,94 @@
     // },
     "task": [
         {
-            "name": "普通任务",
-            "entry": "MyTask1"
+            "name": "完整日常（含启动）",
+            "entry": "启动游戏",
+            "description": "从启动游戏开始，依次执行：关闭公告、进入游戏、关闭签到、好友、远航、竞技场、塔罗之力、神兵试炼、记忆寻回、实战训练、进阶试炼、星辰试炼、光辉锻铸、开拓征程、征服之塔、工会等模块。最后需手动调用关闭游戏任务。",
+            "default_check": true
         },
         {
-            "name": "选项任务",
-            "entry": "MyTask2",
-            "option": [
-                "任务选项1"
-            ]
+            "name": "仅好友功能",
+            "entry": "好友界面",
+            "description": "单独执行好友领取和赠送功能（需已在游戏主界面）。",
+            "default_check": false
         },
         {
-            "name": "参数任务",
-            "entry": "MyTask3",
-            "option": [
-                "任务选项1"
-            ],
-            "pipeline_override": {}
+            "name": "仅远航功能",
+            "entry": "点击文字远航",
+            "description": "单独执行远航功能（需已在游戏主界面）。",
+            "default_check": false
         },
         {
-            "name": "带Custom的任务",
-            "entry": "MyTask4"
+            "name": "仅竞技场（3次）",
+            "entry": "竞技场",
+            "description": "单独执行竞技场3次（需已在游戏主界面）。",
+            "default_check": false
+        },
+        {
+            "name": "仅塔罗之力",
+            "entry": "塔罗之力_开始",
+            "description": "单独执行塔罗之力代行。",
+            "default_check": false
+        },
+        {
+            "name": "仅神兵试炼",
+            "entry": "神兵试炼_开始",
+            "description": "单独执行神兵试炼代行。",
+            "default_check": false
+        },
+        {
+            "name": "仅记忆寻回",
+            "entry": "记忆寻回_开始",
+            "description": "单独执行记忆寻回战斗。",
+            "default_check": false
+        },
+        {
+            "name": "仅实战训练",
+            "entry": "实战训练_开始",
+            "description": "单独执行实战训练代行。",
+            "default_check": false
+        },
+        {
+            "name": "仅进阶试炼",
+            "entry": "进阶试炼_开始",
+            "description": "单独执行进阶试炼代行。",
+            "default_check": false
+        },
+        {
+            "name": "仅星辰试炼",
+            "entry": "星辰试炼_开始",
+            "description": "单独执行星辰试炼代行。",
+            "default_check": false
+        },
+        {
+            "name": "仅光辉锻铸",
+            "entry": "光辉锻铸_开始",
+            "description": "单独执行光辉锻铸代行。",
+            "default_check": false
+        },
+        {
+            "name": "仅开拓征程",
+            "entry": "开拓征程_开始",
+            "description": "单独执行开拓征程任务。",
+            "default_check": false
+        },
+        {
+            "name": "仅征服之塔（8-1至8-5）",
+            "entry": "征服之塔_开始",
+            "description": "单独执行征服之塔8-1至8-5关卡。",
+            "default_check": false
+        },
+        {
+            "name": "仅工会功能",
+            "entry": "工会_开始",
+            "description": "单独执行工会频道点击任务。",
+            "default_check": false
+        },
+        {
+            "name": "关闭游戏",
+            "entry": "关闭游戏",
+            "description": "强制关闭游戏进程（taskkill）。",
+            "default_check": false
         }
-    ],
-    "option": {
-        "任务选项1": {
-            "type": "select",
-            "cases": [
-                {
-                    "name": "文本1",
-                    "pipeline_override": {
-                        "OcrTask": {
-                            "text": "文本1"
-                        }
-                    }
-                },
-                {
-                    "name": "文本2",
-                    "pipeline_override": {
-                        "OcrTask": {
-                            "text": "文本2"
-                        }
-                    }
-                }
-            ]
-        }
-    }
+    ]
 }
