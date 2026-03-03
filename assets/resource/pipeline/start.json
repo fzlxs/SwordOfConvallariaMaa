@@ -1,13 +1,5 @@
 {
     "启动游戏": {
-        "action": "Command",
-        "exec": "\"F:\\TapTap\\PC Games\\SwordOfConvallaria\\SoCLauncher\\XD.exe\"", // 请替换为你的真实游戏路径
-        "post_delay": 10000, // 启动后等待5秒，确保游戏界面加载完成
-        "next": [
-            "点击关闭公告"
-        ]
-    },
-    "点击关闭公告": {
         "recognition": "TemplateMatch",
         "template": "关闭.png",
         "action": "Click",
