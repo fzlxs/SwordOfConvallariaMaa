@@ -10,8 +10,8 @@
     "license": "MIT",
     "welcome": "首次使用请确保游戏窗口已打开，并配置好窗口匹配规则",
     // 填写项目地址和版本号可实现自动更新功能
-    "github": "https://github.com/fzlxs/-maa.git",
-    "version": "1.0.1",
+    "github": "https://github.com/fzlxs/-maa",
+    "version": "1.0.3",
     // Mirror酱为第三方分发服务，新项目默认关闭
     // 若有需要请联系 Mirror酱 开通，直接自行开启是无法使用的
     // "mirrorchyan_rid": "MaaXXX",
@@ -50,9 +50,9 @@
     // },
     "task": [
         {
-            "name": "完整日常（含启动）",
+            "name": "启动游戏",
             "entry": "启动游戏",
-            "description": "从启动游戏开始，依次执行：关闭公告、进入游戏、关闭签到、好友、远航、竞技场、塔罗之力、神兵试炼、记忆寻回、实战训练、进阶试炼、星辰试炼、光辉锻铸、开拓征程、征服之塔、工会等模块。最后需手动调用关闭游戏任务。",
+            "description": "关闭公告、进入游戏、关闭签到",
             "default_check": true
         },
         {
@@ -74,10 +74,11 @@
             "default_check": false
         },
         {
-            "name": "仅塔罗之力",
-            "entry": "塔罗之力_开始",
-            "description": "单独执行塔罗之力代行。",
+            "name": "领取任务",
+            "entry": "领取任务",
+            "description": "领取每日任务（需已在游戏主界面）。",
             "default_check": false
+            
         },
         {
             "name": "仅神兵试炼",
@@ -133,6 +134,13 @@
             "description": "单独执行工会频道点击任务。",
             "default_check": false
         },
+        {   
+            "name": "仅塔罗之力",
+            "entry": "塔罗之力_开始",
+            "description": "单独执行塔罗之力代行。",
+            "default_check": false
+            
+            },
         {
             "name": "关闭游戏",
             "entry": "关闭游戏",

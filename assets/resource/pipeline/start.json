@@ -1,33 +1,39 @@
 {
     "启动游戏": {
+        "next": [
+            "处理关闭",
+            "点击进入游戏"
+        ]
+    },
+    "处理关闭": {
         "recognition": "TemplateMatch",
         "template": "关闭.png",
         "action": "Click",
-        "post_delay": 500, // 【可选】点击后等待500毫秒
+        "post_delay": 500,
         "next": [
             "点击进入游戏"
-        ] // 执行完后跳转到下一个任务
+        ]
     },
     "点击进入游戏": {
         "recognition": "TemplateMatch",
         "template": "进入游戏.png",
-        "action": "Click", // 点击识别到的位置
-        "post_delay": 1000, // 点击后等待，根据实际情况调整
-        "next": [
-            "关闭签到弹窗" // 进入游戏后，先检查签到弹窗
-        ]
-    },
-    "关闭签到弹窗": {
-        "recognition": "TemplateMatch",
-        "template": "关闭签到.png", // 请替换为实际的签到关闭按钮图片
         "action": "Click",
-        "post_delay": 500, // 点击后等待500ms，避免界面未响应
-        "timeout": 2000, // 等待2秒，若未出现则超时
-        "on_error": [],
-        "next": [ // 成功点击后再次检查自身，实现循环关闭
-            "关闭签到弹窗"
+        "post_delay": 3000,      // 点击后等待2.5秒，给游戏加载留出时间
+        "next": [
+            "关闭签到"
         ]
     },
+    "关闭签到": {
+        "recognition": "TemplateMatch",
+        "template": "关闭签到.png",
+        "action": "Click",
+        "roi":[1142, 15, 77, 72], // 限定签到弹窗区域，避免误点其他关闭按钮
+        "post_delay": 500,
+        "timeout": 1500,         // 最多等待2秒识别签到弹窗，若未出现则超时结束
+        "on_error": [],           // 超时后不做任何操作，任务自然结束
+        "next": []                // 点击后任务结束
+    },
+
     "好友界面": {
         "recognition": "TemplateMatch",
         "template": "好友.png",
@@ -65,6 +71,7 @@
     "点击文字远航": {
         "recognition": "OCR",
         "expected": "远航",
+        "roi":[894, 620, 65, 69], // 限定远航按钮区域，避免误点其他按钮
         "action": "Click",
         "post_delay": 1500, // 等待界面加载
         "next": [
@@ -74,8 +81,9 @@
     "点击全部收获": {
         "recognition": "OCR",
         "expected": "全部收获",
+        "roi":[794, 631, 209, 61], // 限定全部收获按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "点击图片返回"
         ] // 改为先执行返回
@@ -84,8 +92,9 @@
     "点击图片返回": {
         "recognition": "TemplateMatch",
         "template": "返回.png", // 请确保此图片存在且与界面匹配
+        "roi":[1184, 604, 73, 72], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800, // 点击后等待界面响应
+        "post_delay": 1500, // 点击后等待界面响应
         "next": [
             "点击派遣"
         ] // 返回后继续后续流程
@@ -93,173 +102,126 @@
     "点击派遣": {
         "recognition": "OCR",
         "expected": "派遣",
+        "roi": [1016, 633, 233, 62],
         "action": "Click",
-        "post_delay": 800,
-        "next": [
-            "点击远航目的地"
-        ]
+        "post_delay": 1500,
+        "next": ["点击远航目的地"]
     },
     "点击远航目的地": {
         "recognition": "TemplateMatch",
         "template": "远航目的地.png",
+        "roi": [533, 139, 53, 39],
         "action": "Click",
-        "post_delay": 800,
-        "next": [
-            "调度额外收益"
-        ] // 指向新加的调度节点
+        "post_delay": 1500,
+        "next": ["随机点击额外收益"]   // 进入调度节点
     },
-    // ---------- 调度两个结果 ----------
-    "调度额外收益": {
-        "next": [
-            {
-                "name": "点击额外收益_结果1",
-                "jump_back": true
-            },
-            {
-                "name": "点击额外收益_结果2",
-                "jump_back": true
-            },
-            "返回上一步"
-        ] // 两个结果都耗尽后，自动执行日常任务
-    },
-    "点击额外收益_结果1": {
+
+    "随机点击额外收益": {
         "recognition": "TemplateMatch",
         "template": "额外收益1.png",
+        "roi": [279, 181, 215, 196],
+        "order_by": "Random", // 随机排序
+        "index": 0, // 取第一个（随机后）        
         "action": "Click",
-        "max_hit": 5,
-        "post_delay": 800,
-        "next": [
-            "选择编队"
-        ] // 点击额外收益五次
+        "post_delay": 1500,
+        "next": ["循环开始"]    // 进入公共编队流程
     },
-    "点击额外收益_结果2": {
-        "recognition": "TemplateMatch",
-        "template": "额外收益2.png",
-        "action": "Click",
-        "max_hit": 5,
-        "post_delay": 800,
+
+    "循环开始":{
         "next": [
-            "选择编队"
+            {
+                "name": "选择编队",
+                "jump_back": true
+            },
+            "返回上一步"        // 耗尽后，进入日常
         ]
     },
-    //公共节点
+
+    // ---------- 公共编队流程（保持不变）----------
     "选择编队": {
         "recognition": "OCR",
         "expected": "选择编队",
+        "roi": [898, 265, 199, 49],
         "action": "Click",
-        "post_delay": 300,
-        "next": [
-            "点击颜色_1"
-        ]
+        "max_hit":10, // 最多点击10次，避免死循环
+        "post_delay": 1500,
+        "next": ["点击颜色_1"]
     },
     "点击颜色_1": {
         "recognition": "ColorMatch",
-        "lower": [
-            100,
-            122,
-            119
-        ], // 示例：根据实际需求调整
-        "upper": [
-            100,
-            122,
-            119
-        ], // 示例：根据实际需求调整
-        "roi": [
-            910,
-            309,
-            234,
-            88
-        ], // 新增：限定识别区域
+        "lower": [100, 122, 119],
+        "upper": [100, 122, 119],
+        "roi": [910, 309, 234, 88],
         "action": "Click",
-        "post_delay": 300,
-        "next": [
-            "点击颜色_2"
-        ]
+        "post_delay": 1000,
+        "next": ["点击颜色_2"]
     },
     "点击颜色_2": {
         "recognition": "ColorMatch",
-        "lower": [
-            88,
-            91,
-            106
-        ],
-        "upper": [
-            88,
-            91,
-            106
-        ],
-        "roi": [
-            769,
-            563,
-            343,
-            58
-        ],
+        "lower": [88, 91, 106],
+        "upper": [88, 91, 106],
+        "roi": [769, 563, 343, 58],
         "action": "Click",
-        "post_delay": 300,
-        "next": [
-            "点击派遣_2"
-        ]
+        "post_delay": 1000,
+        "next": ["点击派遣_2"]
     },
     "点击派遣_2": {
         "recognition": "OCR",
         "expected": "派遣",
+        "roi": [1016, 633, 233, 62],
         "action": "Click",
-        "post_delay": 800,
-        "next": []
-    }, //公共节点结束
+        "post_delay": 1500,
+        "next": []   // 空，依靠 jump_back 返回调度收益
+    },
+
+    // ---------- 日常任务（保持不变）----------
     "返回上一步": {
         "recognition": "TemplateMatch",
         "template": "返回上一步.png",
+        "roi": [24, 7, 87, 55],
         "action": "Click",
-        "post_delay": 800,
-        "next": [
-            "点击远航日常"
-        ]
+        "post_delay": 1500,
+        "next": ["点击远航日常"]
     },
     "点击远航日常": {
         "recognition": "TemplateMatch",
-        "template": "远航日常.png", // 请替换为实际图片文件名
+        "template": "远航日常.png",
+        "roi": [237, 612, 82, 81],
         "action": "Click",
-        "post_delay": 800, // 等待界面加载
-        "next": [
-            "点击文字领取"
-        ]
+        "post_delay": 1500,
+        "next": ["点击文字领取"]
     },
     "点击文字领取": {
         "recognition": "OCR",
-        "expected": "领取", // 识别文字“领取”
+        "expected": "领取",
         "action": "Click",
         "post_delay": 800,
-        "next": [
-            "点击日常返回"
-        ]
+        "next": ["点击日常返回"]
     },
     "点击日常返回": {
         "recognition": "TemplateMatch",
-        "template": "返回.png", // 与之前的返回按钮图片相同
+        "template": "返回.png",
+        "roi": [1148, 593, 129, 117],
         "action": "Click",
         "post_delay": 500,
-        "next": [
-            "循环返回上一步"
-        ] // 完成后跳转到最终的返回上一步
+        "next": ["远航返回上一步"]
     },
     // ---------- 循环返回直到主界面 ----------
-    "循环返回上一步": {
+    "远航返回上一步": {
         "recognition": "TemplateMatch",
         "template": "返回上一步.png",
         "action": "Click",
-        "post_delay": 500, // 点击后等待界面变化
-        "timeout": 3000, // 若3秒内未检测到返回按钮，则认为已到达主界面
-        "next": [
-            "循环返回上一步"
-        ] // 检测到返回按钮则点击并继续循环
+        "post_delay": 500,
+        "timeout": 3000,
+        "next": []
     },
     // ---------- 竞技场开始 ----------
     "竞技场": {
         "recognition": "TemplateMatch",
         "template": "告示牌.png", // 请替换为实际截图
+        "roi":[1079, 467, 154, 66], // 限定告示牌区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "竞技场_点击荣耀之战"
         ]
@@ -268,31 +230,16 @@
         "recognition": "OCR",
         "expected": "荣耀之战",
         "action": "Click",
-        "post_delay": 800,
+        "roi":[180, 556, 128, 44], // 限定荣耀之战按钮区域，避免误点其他位置
+        "post_delay": 1500,
         "next": [
             "竞技场_点击固定位置_1"
         ]
     },
     "竞技场_点击固定位置_1": {
-        "recognition": "ColorMatch",
-        "lower": [
-            236,
-            227,
-            199
-        ], // [246-10, 237-10, 209-10]
-        "upper": [
-            255,
-            247,
-            219
-        ], // [246+10, 237+10, 209+10] 上限不超过255
-        "roi": [
-            516,
-            476,
-            53,
-            50
-        ],
         "action": "Click",
-        "post_delay": 800,
+        "target":[521, 474, 40, 52], // 固定位置点击，避免识别失败无法点击
+        "post_delay": 1500,
         "next": [
             "竞技场_点击开始_1"
         ]
@@ -300,6 +247,7 @@
     "竞技场_点击开始_1": {
         "recognition": "OCR",
         "expected": "开始",
+        "roi":[1147, 533, 68, 67], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -310,6 +258,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "action": "Click",
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
@@ -333,7 +282,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "竞技场_点击返回按钮_1"
         ] // 识别成功后，跳转到点击返回按钮
@@ -349,7 +298,7 @@
             97
         ], // 限定区域
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 4000,
         "timeout": 5000, // 设置一个合理的超时，防止异常
         // 如果超时未找到按钮，继续下一步即可
         "next": [
@@ -357,25 +306,9 @@
         ]
     },
     "竞技场_点击固定位置_2": {
-        "recognition": "ColorMatch",
-        "lower": [
-            236,
-            227,
-            199
-        ], // [246-10, 237-10, 209-10]
-        "upper": [
-            255,
-            247,
-            219
-        ], // [246+10, 237+10, 209+10] 上限不超过255
-        "roi": [
-            516,
-            476,
-            53,
-            50
-        ],
-        "action": "Click",
-        "post_delay": 800,
+         "action": "Click",
+        "target":[521, 474, 40, 52], // 固定位置点击，避免识别失败无法点击
+        "post_delay": 1500,
         "next": [
             "竞技场_点击开始_2"
         ]
@@ -383,6 +316,7 @@
     "竞技场_点击开始_2": {
         "recognition": "OCR",
         "expected": "开始",
+        "roi":[1147, 533, 68, 67], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -393,6 +327,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "action": "Click",
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
@@ -416,7 +351,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "竞技场_点击返回按钮_2"
         ] // 识别成功后，跳转到点击返回按钮
@@ -432,7 +367,7 @@
             97
         ], // 限定区域
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 4000,
         "timeout": 5000, // 设置一个合理的超时，防止异常
         // 如果超时未找到按钮，继续下一步即可
         "next": [
@@ -440,25 +375,9 @@
         ]
     },
     "竞技场_点击固定位置_3": {
-        "recognition": "ColorMatch",
-        "lower": [
-            236,
-            227,
-            199
-        ], // [246-10, 237-10, 209-10]
-        "upper": [
-            255,
-            247,
-            219
-        ], // [246+10, 237+10, 209+10] 上限不超过255
-        "roi": [
-            516,
-            476,
-            53,
-            50
-        ],
         "action": "Click",
-        "post_delay": 800,
+        "target":[521, 474, 40, 52], // 固定位置点击，避免识别失败无法点击
+        "post_delay": 1500,
         "next": [
             "竞技场_点击开始_3"
         ]
@@ -466,6 +385,7 @@
     "竞技场_点击开始_3": {
         "recognition": "OCR",
         "expected": "开始",
+        "roi":[1147, 533, 68, 67], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -476,6 +396,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "action": "Click",
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
@@ -499,7 +420,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "竞技场_点击返回按钮_3"
         ] // 识别成功后，跳转到点击返回按钮
@@ -515,7 +436,7 @@
             97
         ], // 限定区域
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 4000,
         "timeout": 5000, // 设置一个合理的超时，防止异常
         // 如果超时未找到按钮，继续下一步即可
         "next": [
@@ -525,8 +446,9 @@
     "竞技场_点击任务图片": {
         "recognition": "TemplateMatch",
         "template": "竞技场任务.png", // 请替换为实际截图
+        "roi":[873, 620, 80, 80], // 限定任务图片区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 3000,
         "next": [
             "竞技场_点击全部领取"
         ]
@@ -535,34 +457,32 @@
         "recognition": "OCR",
         "expected": "全部领取",
         "action": "Click",
-        "post_delay": 800,
+        "roi":[917, 623, 246, 56], // 限定全部领取按钮区域，避免误点其他位置
+        "post_delay": 1500,
         "next": [
             "竞技场_循环返回"
         ]
     },
     "竞技场_循环返回": {
-        "recognition": "DirectHit",
-        "target": [
-            149,
-            11,
-            59,
-            43
-        ], // 在指定矩形区域内随机点击 
+        "recognition": "TemplateMatch",
+        "template": "返回上一步.png", // 返回按钮图片
+        "roi": [2, 1, 143, 69], // 在指定矩形区域内随机点击 
         "action": "Click",
-        "repeat": 3,
-        "repeat_delay": 1000,
+        "repeat": 4,
+        "repeat_delay": 2500,
         "post_delay": 1000,
         "timeout": 3000,
         // 超时即回到主界面，结束脚本
         "next": []
     },
     // 入口节点：点击任务图片进入任务界面
-    "领取任务_点击任务图片": {
+    "领取任务": {
         "recognition": "TemplateMatch",
         "template": "每日任务.png", // 请准备任务图标的模板图片
+        "roi":[343, 87, 74, 62], // 限定任务图片区域，避免误点其他位置
         "threshold": 0.8,
         "action": "Click",
-        "post_delay": 1000, // 点击后等待界面加载
+        "post_delay": 1500, // 点击后等待界面加载
         "next": [
             "领取任务_点击全部领取"
         ]
@@ -571,9 +491,10 @@
     "领取任务_点击全部领取": {
         "recognition": "OCR",
         "expected": "全部领取", // 识别的文字
+        "roi":[937, 13, 248, 46], // 限定全部领取按钮区域，避免误点其他位置
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "领取任务_点击返回图片"
         ]
@@ -583,8 +504,14 @@
         "recognition": "TemplateMatch",
         "template": "返回.png", // 返回按钮图片
         "threshold": 0.8,
+        "roi":[
+            1159,
+            596,
+            105,
+            97
+        ], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "领取任务_点击返回上一步"
         ]
@@ -593,9 +520,10 @@
     "领取任务_点击返回上一步": {
         "recognition": "TemplateMatch",
         "template": "返回上一步.png", // 可能相同的图片但位置不同，或另一张图片
+        "roi":[26, 1, 93, 64], // 限定返回上一步按钮区域，避免误点其他位置
         "threshold": 0.8,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 2000,
         "next": [] // 执行完毕，next 为空则任务结束
     },
     // ---------- 塔罗之力开始 ----------
@@ -611,8 +539,9 @@
         "recognition": "TemplateMatch",
         "template": "塔罗.png", // 请准备塔罗图标模板
         "threshold": 0.8,
+        "roi":[0, 508, 77, 62], // 限定塔罗图标区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800, // 点击后等待界面稳定
+        "post_delay": 1500, // 点击后等待界面稳定
         "next": [
             "塔罗之力_识别高额"
         ]
@@ -622,8 +551,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "塔罗之力_点击交错世界"
         ]
@@ -633,8 +563,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         // 点击后回到开始，再次尝试点击塔罗（形成循环直到成功）
         "next": [
             "塔罗之力_开始"
@@ -653,7 +584,7 @@
         "order_by": "Random", // 随机排序
         "index": 0, // 取第一个（随机后）
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "塔罗之力_点击代行"
         ]
@@ -670,7 +601,7 @@
         ],
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "塔罗之力_点击继续代行"
         ]
@@ -679,9 +610,10 @@
     "塔罗之力_点击继续代行": {
         "recognition": "OCR",
         "expected": "继续代行",
+        "roi":[643, 467, 138, 43], // 限定继续代行按钮区域，避免误点其他位置
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "塔罗之力_点击确认"
         ]
@@ -691,8 +623,9 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
+        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "点击塔罗返回图片"
         ]
@@ -701,8 +634,9 @@
         "recognition": "TemplateMatch",
         "template": "返回.png", // 返回按钮图片
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "塔罗_循环返回"
         ]
@@ -717,8 +651,8 @@
         ], // 在指定矩形区域内随机点击 
         "action": "Click",
         "repeat": 3,
-        "repeat_delay": 1000,
-        "post_delay": 1000,
+        "repeat_delay": 2000,
+        "post_delay": 2000,
         "timeout": 3000,
         // 超时即回到主界面，结束脚本
         "next": []
@@ -737,8 +671,9 @@
         "recognition": "OCR",
         "expected": "神兵试炼",
         "threshold": 0.7,
+        "roi":[154, 530, 89, 29], // 限定神兵试炼按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "神兵试炼_点击颜色区域"
         ]
@@ -748,8 +683,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "神兵试炼_点击交错世界"
         ]
@@ -759,8 +695,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         // 回到开始，再次检测神兵试炼（循环直到成功）
         "next": [
             "神兵试炼_开始"
@@ -789,7 +726,7 @@
         "order_by": "Random", // 随机排序
         "index": 0, // 取随机后的第一个
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "神兵试炼_点击代行"
         ]
@@ -806,7 +743,7 @@
         "expected": "代行",
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "神兵试炼_点击继续代行"
         ]
@@ -816,8 +753,9 @@
         "recognition": "OCR",
         "expected": "继续代行",
         "threshold": 0.7,
+        "roi":[643, 467, 138, 43], // 限定继续代行按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "神兵试炼_点击确认"
         ]
@@ -827,8 +765,9 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
+        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "点击神兵返回图片"
         ] // 任务结束
@@ -837,8 +776,9 @@
         "recognition": "TemplateMatch",
         "template": "返回.png", // 返回按钮图片
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "神兵_循环返回"
         ]
@@ -853,8 +793,8 @@
         ], // 在指定矩形区域内随机点击 
         "action": "Click",
         "repeat": 3,
-        "repeat_delay": 1000,
-        "post_delay": 1000,
+        "repeat_delay": 2000,
+        "post_delay": 2000,
         "timeout": 3000,
         // 超时即回到主界面，结束脚本
         "next": []
@@ -873,8 +813,9 @@
         "recognition": "OCR",
         "expected": "记忆寻回",
         "threshold": 0.7,
+        "roi":[353, 546, 107, 34], // 限定记忆寻回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "记忆寻回_点击出击"
         ]
@@ -884,8 +825,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "记忆寻回_点击交错世界"
         ]
@@ -895,8 +837,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         // 回到开始，再次检测记忆寻回（循环直到成功）
         "next": [
             "记忆寻回_开始"
@@ -907,8 +850,9 @@
         "recognition": "OCR",
         "expected": "出击",
         "threshold": 0.7,
+        "roi":[955, 615, 70, 35], // 限定出击按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 5000,
         "next": [
             "记忆寻回_点击开始"
         ]
@@ -916,6 +860,7 @@
     "记忆寻回_点击开始": {
         "recognition": "OCR",
         "expected": "开始",
+        "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -926,6 +871,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "action": "Click",
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
@@ -949,7 +895,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 5000,
         "next": [
             "记忆寻回_点击返回按钮"
         ] // 识别成功后，跳转到点击返回按钮
@@ -966,7 +912,7 @@
         ], // 限定区域
         "action": "Click",
         "repeat": 2,
-        "post_delay": 800,
+        "post_delay": 1500,
         "timeout": 5000, // 设置一个合理的超时，防止异常
         // 如果超时未找到按钮，继续下一步即可
         "next": [
@@ -982,9 +928,9 @@
             43
         ], // 在指定矩形区域内随机点击 
         "action": "Click",
-        "repeat": 3,
-        "repeat_delay": 1000,
-        "post_delay": 1000,
+        "repeat": 4,
+        "repeat_delay": 2000,
+        "post_delay": 2000,
         "timeout": 3000,
         // 超时即回到主界面，结束脚本
         "next": []
@@ -1003,8 +949,9 @@
         "recognition": "OCR",
         "expected": "实战训练",
         "threshold": 0.7,
+        "roi":[587, 581, 114, 36], // 限定实战训练按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "实战训练_点击代行"
         ]
@@ -1014,8 +961,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "实战训练_点击交错世界"
         ]
@@ -1025,8 +973,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         // 回到开始，再次检测实战训练（循环直到成功）
         "next": [
             "实战训练_开始"
@@ -1044,7 +993,7 @@
         "expected": "代行",
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "实战训练_点击继续代行"
         ] // 确保节点名称与现有配置一致
@@ -1053,8 +1002,9 @@
         "recognition": "OCR",
         "expected": "继续代行",
         "threshold": 0.7,
+        "roi":[650, 471, 120, 37], // 限定继续代行按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "实战训练_点击确认"
         ]
@@ -1063,8 +1013,9 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
+        "roi":[939, 638, 99, 38], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "点击实战返回图片"
         ]
@@ -1073,8 +1024,9 @@
         "recognition": "TemplateMatch",
         "template": "返回.png", // 返回按钮图片
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "实战_循环返回"
         ]
@@ -1089,8 +1041,8 @@
         ], // 在指定矩形区域内随机点击 
         "action": "Click",
         "repeat": 3,
-        "repeat_delay": 1000,
-        "post_delay": 1000,
+        "repeat_delay": 2000,
+        "post_delay": 2000,
         "timeout": 3000,
         // 超时即回到主界面，结束脚本
         "next": []
@@ -1109,8 +1061,9 @@
         "recognition": "OCR",
         "expected": "进阶试炼",
         "threshold": 0.7,
+        "roi":[831, 547, 89, 33], // 限定进阶试炼按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "进阶试炼_识别高额"
         ]
@@ -1120,8 +1073,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "进阶试炼_点击交错世界"
         ]
@@ -1131,8 +1085,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         // 回到开始，再次检测进阶试炼（循环直到成功）
         "next": [
             "进阶试炼_开始"
@@ -1141,17 +1096,12 @@
     // 在指定区域内识别“高额”并随机点击一个结果
     "进阶试炼_识别高额": {
         "recognition": "OCR",
-        "roi": [
-            21,
-            100,
-            1203,
-            112
-        ], // 用户指定的区域
+        "roi": [21, 124, 1090, 77], // 用户指定的区域
         "expected": "高额",
         "order_by": "Random", // 随机排序
         "index": 0, // 取随机后的第一个
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "进阶试炼_点击代行"
         ]
@@ -1168,7 +1118,7 @@
         ],
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "进阶试炼_点击继续代行"
         ]
@@ -1178,8 +1128,9 @@
         "recognition": "OCR",
         "expected": "继续代行",
         "threshold": 0.7,
+        "roi":[643, 467, 138, 43], // 限定继续代行按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "进阶试炼_点击确认"
         ]
@@ -1189,8 +1140,9 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
+        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "点击试炼返回图片"
         ] // 任务结束
@@ -1199,8 +1151,9 @@
         "recognition": "TemplateMatch",
         "template": "返回.png", // 返回按钮图片
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "进阶试炼_循环返回"
         ]
@@ -1215,8 +1168,8 @@
         ], // 在指定矩形区域内随机点击 
         "action": "Click",
         "repeat": 3,
-        "repeat_delay": 1000,
-        "post_delay": 1000,
+        "repeat_delay": 2000,
+        "post_delay": 2000,
         "timeout": 3000,
         // 超时即回到主界面，结束脚本
         "next": []
@@ -1235,8 +1188,9 @@
         "recognition": "OCR",
         "expected": "星辰试炼",
         "threshold": 0.7,
+        "roi":[1044, 529, 83, 30], // 限定星辰试炼按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "星辰试炼_识别高额"
         ]
@@ -1246,8 +1200,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "星辰试炼_点击交错世界"
         ]
@@ -1257,8 +1212,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         // 回到开始，再次检测星辰试炼（循环直到成功）
         "next": [
             "星辰试炼_开始"
@@ -1267,17 +1223,12 @@
     // 在指定区域内识别“高额”并随机点击一个结果
     "星辰试炼_识别高额": {
         "recognition": "OCR",
-        "roi": [
-            201,
-            95,
-            861,
-            124
-        ], // 用户指定的区域
+        "roi": [202, 110, 677, 80], // 用户指定的区域
         "expected": "高额",
         "order_by": "Random", // 随机排序
         "index": 0, // 取随机后的第一个
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "星辰试炼_点击代行"
         ]
@@ -1286,15 +1237,10 @@
     "星辰试炼_点击代行": {
         "recognition": "OCR",
         "expected": "代行",
-        "roi": [
-            828,
-            591,
-            188,
-            80
-        ],
+        "roi": [847, 617, 48, 28],
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "星辰试炼_点击继续代行"
         ]
@@ -1304,8 +1250,9 @@
         "recognition": "OCR",
         "expected": "继续代行",
         "threshold": 0.7,
+        "roi":[647, 469, 135, 40], // 限定继续代行按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "星辰试炼_点击确认"
         ]
@@ -1315,8 +1262,9 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
+        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "点击星辰试炼返回图片"
         ]
@@ -1325,8 +1273,9 @@
         "recognition": "TemplateMatch",
         "template": "返回.png", // 返回按钮图片
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "星辰试炼_循环返回"
         ]
@@ -1341,8 +1290,8 @@
         ], // 在指定矩形区域内随机点击 
         "action": "Click",
         "repeat": 3,
-        "repeat_delay": 1000,
-        "post_delay": 1000,
+        "repeat_delay": 2000,
+        "post_delay": 2000,
         "timeout": 3000,
         // 超时即回到主界面，结束脚本
         "next": []
@@ -1359,9 +1308,10 @@
     "光辉锻铸_点击出航": {
         "recognition": "OCR",
         "expected": "出航",
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "光辉锻铸_点击交错世界"
         ]
@@ -1371,8 +1321,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "光辉锻铸_滑动翻页"
         ]
@@ -1388,8 +1339,8 @@
             227,
             637
         ],
-        "duration": 200, // 可根据实际调整
-        "post_delay": 800,
+        "duration": 500, // 可根据实际调整
+        "post_delay": 1500,
         "next": [
             "光辉锻铸_检测入口"
         ]
@@ -1407,8 +1358,9 @@
         "recognition": "OCR",
         "expected": "光辉锻铸",
         "threshold": 0.7,
+        "roi":[148, 528, 322, 65], // 限定光辉锻铸按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "光辉锻铸_点击代行"
         ]
@@ -1425,7 +1377,7 @@
         "expected": "代行",
         "threshold": 0.7,
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "光辉锻铸_点击继续代行"
         ]
@@ -1435,8 +1387,9 @@
         "recognition": "OCR",
         "expected": "继续代行",
         "threshold": 0.7,
+        "roi":[643, 467, 138, 43], // 限定继续代行按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "光辉锻铸_点击确认"
         ]
@@ -1446,8 +1399,9 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
+        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "点击实战返回图片"
         ] // 复用您已有的返回节点
@@ -1465,8 +1419,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "开拓征程_点击交错世界"
         ]
@@ -1476,8 +1431,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "开拓征程_滑动翻页"
         ]
@@ -1493,8 +1449,8 @@
             227,
             637
         ],
-        "duration": 200, // 可根据实际调整
-        "post_delay": 800,
+        "duration": 500, // 可根据实际调整
+        "post_delay": 1500,
         "next": [
             "开拓征程_检测入口"
         ]
@@ -1512,8 +1468,9 @@
         "recognition": "OCR",
         "expected": "开拓征程",
         "threshold": 0.7,
+        "roi":[530, 537, 419, 86], // 限定开拓征程按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "开拓征程_点击星海开拓"
         ]
@@ -1523,8 +1480,9 @@
         "recognition": "OCR",
         "expected": "星海开拓",
         "threshold": 0.7,
+        "roi":[329, 159, 128, 43], // 限定星海开拓按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "开拓征程_点击固定区域1"
         ]
@@ -1538,7 +1496,7 @@
             87,
             76
         ], // 区域内随机点
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "开拓征程_点击领取"
         ]
@@ -1548,8 +1506,9 @@
         "recognition": "OCR",
         "expected": "领取",
         "threshold": 0.7,
+        "roi":[789, 609, 65, 39], // 限定领取按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 1000,
+        "post_delay": 1800,
         "next": [
             "开拓征程_点击返回图片"
         ]
@@ -1559,8 +1518,9 @@
         "recognition": "TemplateMatch",
         "template": "返回.png",
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "开拓征程_点击固定区域2"
         ]
@@ -1574,7 +1534,7 @@
             50,
             12
         ], // 区域内随机点
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "星辰试炼_循环返回"
         ] // 任务结束
@@ -1592,8 +1552,9 @@
         "recognition": "OCR",
         "expected": "出航",
         "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "征服之塔_点击交错世界"
         ]
@@ -1603,8 +1564,9 @@
         "recognition": "OCR",
         "expected": "交错的世界",
         "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "征服之塔_滑动翻页"
         ]
@@ -1620,8 +1582,8 @@
             227,
             637
         ],
-        "duration": 200,
-        "post_delay": 800,
+        "duration": 500,
+        "post_delay": 1500,
         "next": [
             "征服之塔_检测入口"
         ]
@@ -1639,8 +1601,9 @@
         "recognition": "OCR",
         "expected": "征服之塔",
         "threshold": 0.7,
+        "roi":[319, 542, 413, 89], // 限定征服之塔按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "征服之塔_点击固定区域"
         ]
@@ -1654,7 +1617,7 @@
             54,
             76
         ],
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "征服之塔_点击8_1"
         ]
@@ -1664,6 +1627,7 @@
         "recognition": "OCR",
         "expected": "8-1",
         "threshold": 0.7,
+        "roi":[725, 527, 72, 29], // 限定8-1按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1674,6 +1638,7 @@
         "recognition": "OCR",
         "expected": "开始战斗",
         "threshold": 0.7,
+        "roi":[924, 616, 229, 32], // 限定开始按钮区域，避免误点其他位置       
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1684,6 +1649,7 @@
         "recognition": "OCR",
         "expected": "开始",
         "threshold": 0.7,
+        "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1694,6 +1660,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "threshold": 0.7,
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "action": "Click",
         "rate_limit": 1000,
         "timeout": 600000,
@@ -1718,7 +1685,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "征服之塔_点击返回图片_1"
         ]
@@ -1727,6 +1694,7 @@
         "recognition": "TemplateMatch",
         "template": "返回.png",
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1738,6 +1706,7 @@
         "recognition": "OCR",
         "expected": "8-2",
         "threshold": 0.7,
+        "roi":[445, 428, 70, 33], // 限定8-2按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1748,6 +1717,7 @@
         "recognition": "OCR",
         "expected": "开始战斗",
         "threshold": 0.7,
+        "roi":[924, 616, 229, 32], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1758,6 +1728,7 @@
         "recognition": "OCR",
         "expected": "开始",
         "threshold": 0.7,
+        "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1768,6 +1739,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "threshold": 0.7,
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "action": "Click",
         "rate_limit": 1000,
         "timeout": 600000,
@@ -1791,7 +1763,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "征服之塔_点击返回图片_2"
         ]
@@ -1800,6 +1772,7 @@
         "recognition": "TemplateMatch",
         "template": "返回.png",
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1811,6 +1784,7 @@
         "recognition": "OCR",
         "expected": "8-3",
         "threshold": 0.7,
+        "roi":[735, 332, 56, 30], // 限定8-3按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1821,6 +1795,7 @@
         "recognition": "OCR",
         "expected": "开始战斗",
         "threshold": 0.7,
+        "roi":[924, 616, 229, 32], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1831,6 +1806,7 @@
         "recognition": "OCR",
         "expected": "开始",
         "threshold": 0.7,
+        "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1841,6 +1817,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "threshold": 0.7,
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "action": "Click",
         "rate_limit": 1000,
         "timeout": 600000,
@@ -1864,7 +1841,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "征服之塔_点击返回图片_3"
         ]
@@ -1873,6 +1850,7 @@
         "recognition": "TemplateMatch",
         "template": "返回.png",
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1884,6 +1862,7 @@
         "recognition": "OCR",
         "expected": "8-4",
         "threshold": 0.7,
+        "roi":[450, 233, 54, 32], // 限定8-4按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1894,6 +1873,7 @@
         "recognition": "OCR",
         "expected": "开始战斗",
         "threshold": 0.7,
+        "roi":[924, 616, 229, 32], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1904,6 +1884,7 @@
         "recognition": "OCR",
         "expected": "开始",
         "threshold": 0.7,
+        "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1914,6 +1895,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "threshold": 0.7,
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "action": "Click",
         "rate_limit": 1000,
         "timeout": 600000,
@@ -1937,7 +1919,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "征服之塔_点击返回图片_4"
         ]
@@ -1946,14 +1928,17 @@
         "recognition": "TemplateMatch",
         "template": "返回.png",
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [] // 任务结束
-    }, // ===== 关卡 8-5 =====
+    }, 
+    // ===== 关卡 8-5 =====
     "征服之塔_点击8_5": {
         "recognition": "OCR",
         "expected": "8-5",
         "threshold": 0.7,
+        "ROI":[735, 136, 56, 29], // 限定8-5按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1964,6 +1949,7 @@
         "recognition": "OCR",
         "expected": "开始战斗",
         "threshold": 0.7,
+        "roi":[924, 616, 229, 32], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -1974,6 +1960,7 @@
         "recognition": "OCR",
         "expected": "开始",
         "threshold": 0.7,
+        "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 2000,
         "next": [
@@ -1984,6 +1971,7 @@
         "recognition": "OCR",
         "expected": "手动",
         "threshold": 0.7,
+        "roi":[79, 8, 127, 52], // 限定手动按钮区域，避免误点其他位置
         "action": "Click",
         "rate_limit": 1000,
         "timeout": 600000,
@@ -2007,7 +1995,7 @@
         "rate_limit": 1000,
         "timeout": 600000,
         // 新增：关闭画面冻结等待（解决20秒无效等待问题）
-        "post_delay": 0,
+        "post_delay": 3000,
         "next": [
             "征服之塔_点击返回图片_5"
         ]
@@ -2016,6 +2004,7 @@
         "recognition": "TemplateMatch",
         "template": "返回.png",
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -2030,7 +2019,7 @@
             44,
             52
         ],
-        "post_delay": 800,
+        "post_delay": 1500,
         "next": [
             "征服之塔_点击返回图片"
         ]
@@ -2039,6 +2028,7 @@
         "recognition": "TemplateMatch",
         "template": "返回.png",
         "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 5000,
         "next": [
@@ -2058,12 +2048,7 @@
     "工会_检测图片": {
         "recognition": "TemplateMatch",
         "template": "工会.png", // 请将工会图标截图命名为工会.png，放入image文件夹
-        "roi": [
-            1138,
-            334,
-            103,
-            108
-        ], // 指定检测区域
+        "roi": [1212, 348, 38, 39], // 指定检测区域
         "threshold": 0.8, // 匹配阈值，可根据实际情况调整
         "action": "DoNothing", // 仅识别，不执行动作
         "next": [
@@ -2075,8 +2060,9 @@
         "recognition": "OCR",
         "expected": "频道",
         "threshold": 0.7,
+        "roi":[1094, 373, 61, 37], // 限定频道按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 800, // 点击后等待界面稳定
+        "post_delay": 1500, // 点击后等待界面稳定
         "next": [
             "工会_点击区域两次"
         ]
@@ -2084,12 +2070,7 @@
     // 在指定区域连续点击两次
     "工会_点击区域两次": {
         "action": "Click",
-        "target": [
-            940,
-            615,
-            65,
-            59
-        ], // 在矩形区域内随机点击
+        "target": [960, 627, 41, 45], // 在矩形区域内随机点击
         "repeat": 2, // 重复执行2次
         "repeat_delay": 1500, // 两次点击间隔500ms
         "post_delay": 2000,
