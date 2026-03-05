@@ -85,7 +85,9 @@
         "action": "Click",
         "post_delay": 1500,
         "next": [
-            "点击图片返回"
+            "点击图片返回",
+            "去派遣"
+            
         ] // 改为先执行返回
     },
     // 新增任务：点击图片返回
@@ -95,10 +97,12 @@
         "roi":[1184, 604, 73, 72], // 限定返回按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 1500, // 点击后等待界面响应
-        "next": [
-            "点击派遣"
-        ] // 返回后继续后续流程
-    },
+    "next": ["点击派遣"]
+},
+"去派遣": {
+    "action": "DoNothing",
+    "next": ["点击派遣"]
+},
     "点击派遣": {
         "recognition": "OCR",
         "expected": "派遣",
@@ -107,6 +111,7 @@
         "post_delay": 1500,
         "next": ["点击远航目的地"]
     },
+    
     "点击远航目的地": {
         "recognition": "TemplateMatch",
         "template": "远航目的地.png",
@@ -189,7 +194,7 @@
         "roi": [237, 612, 82, 81],
         "action": "Click",
         "post_delay": 1500,
-        "next": ["点击文字领取"]
+        "next": ["点击文字领取","远航返回"]
     },
     "点击文字领取": {
         "recognition": "OCR",
@@ -204,6 +209,13 @@
         "roi": [1148, 593, 129, 117],
         "action": "Click",
         "post_delay": 500,
+        "next": ["远航返回上一步"]
+    },
+    "远航返回":{
+        "action": "Click",
+        "target":[44, 378, 34, 34], // 固定位置点击，避免识别失败无法点击
+        "post_delay": 500,
+        "timeout": 3000,
         "next": ["远航返回上一步"]
     },
     // ---------- 循环返回直到主界面 ----------
@@ -584,6 +596,7 @@
         "order_by": "Random", // 随机排序
         "index": 0, // 取第一个（随机后）
         "action": "Click",
+                "target_offset":[52, 10, 0, 0], // 点击位置相对于识别到的文字进行偏移，避免误点其他位置
         "post_delay": 1500,
         "next": [
             "塔罗之力_点击代行"
@@ -1013,7 +1026,7 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
-        "roi":[939, 638, 99, 38], // 限定确认按钮区域，避免误点其他位置
+        "roi":[954, 643, 81, 29], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 1500,
         "next": [
@@ -1101,6 +1114,7 @@
         "order_by": "Random", // 随机排序
         "index": 0, // 取随机后的第一个
         "action": "Click",
+        "target_offset":[52, 10, 0, 0], // 点击位置相对于识别到的文字进行偏移，避免误点其他位置
         "post_delay": 1500,
         "next": [
             "进阶试炼_点击代行"
@@ -1140,7 +1154,7 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
-        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
+        "roi":[954, 643, 81, 29], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 1500,
         "next": [
@@ -1227,7 +1241,8 @@
         "expected": "高额",
         "order_by": "Random", // 随机排序
         "index": 0, // 取随机后的第一个
-        "action": "Click",
+        "action": "Click",        
+        "target_offset":[52, 10, 0, 0], // 点击位置相对于识别到的文字进行偏移，避免误点其他位置
         "post_delay": 1500,
         "next": [
             "星辰试炼_点击代行"
@@ -1262,7 +1277,7 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
-        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
+        "roi":[954, 643, 81, 29], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 1500,
         "next": [
@@ -1399,7 +1414,7 @@
         "recognition": "OCR",
         "expected": "确认",
         "threshold": 0.7,
-        "roi":[947, 638, 74, 39], // 限定确认按钮区域，避免误点其他位置
+        "roi":[954, 643, 81, 29], // 限定确认按钮区域，避免误点其他位置
         "action": "Click",
         "post_delay": 1500,
         "next": [
