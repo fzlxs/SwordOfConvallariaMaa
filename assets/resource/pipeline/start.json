@@ -261,7 +261,7 @@
         "expected": "开始",
         "roi":[1147, 533, 68, 67], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 5000,
+        "post_delay": 6000,
         "next": [
             "竞技场_点击手动_1"
         ]
@@ -338,7 +338,7 @@
         "expected": "开始",
         "roi":[1147, 533, 68, 67], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 5000,
+        "post_delay": 6000,
         "next": [
             "竞技场_点击手动_2"
         ]
@@ -415,7 +415,7 @@
         "expected": "开始",
         "roi":[1147, 533, 68, 67], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 5000,
+        "post_delay": 6000,
         "next": [
             "竞技场_点击手动_3"
         ]
@@ -889,7 +889,7 @@
         "threshold": 0.7,
         "roi":[955, 615, 70, 35], // 限定出击按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 5000,
+        "post_delay": 6000,
         "next": [
             "记忆寻回_点击开始"
         ]
@@ -1676,7 +1676,7 @@
         "threshold": 0.7,
         "roi":[924, 616, 229, 32], // 限定开始按钮区域，避免误点其他位置       
         "action": "Click",
-        "post_delay": 5000,
+        "post_delay": 6000,
         "next": [
             "征服之塔_点击开始_1"
         ]
@@ -1687,7 +1687,7 @@
         "threshold": 0.7,
         "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 4000,
+        "post_delay": 6000,
         "next": [
             "征服之塔_点击手动_1"
         ]
@@ -1763,7 +1763,7 @@
         "threshold": 0.7,
         "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 4000,
+        "post_delay": 6000,
         "next": [
             "征服之塔_点击手动_2"
         ]
@@ -1838,7 +1838,7 @@
         "threshold": 0.7,
         "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 5000,
+        "post_delay": 6000,
         "next": [
             "征服之塔_点击手动_3"
         ]
@@ -1913,7 +1913,7 @@
         "threshold": 0.7,
         "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 4000,
+        "post_delay": 6000,
         "next": [
             "征服之塔_点击手动_4"
         ]
@@ -1986,7 +1986,7 @@
         "threshold": 0.7,
         "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
         "action": "Click",
-        "post_delay": 4000,
+        "post_delay": 6000,
         "next": [
             "征服之塔_点击手动_5"
         ]
@@ -2107,6 +2107,122 @@
         "action": "DoNothing",
         "next": []
     },
+    // 开始开拓循环刷关步骤
+    // 主入口：点击“出击”
+    "开拓征程-关卡": {
+        "recognition": "OCR",
+        "expected": "出击",
+        "threshold": 0.7,
+        "roi": [1036, 632, 91, 38],
+        "action": "Click",
+        "post_delay": 1500,
+        "next": ["挑战开拓征程-关卡"]
+    },
+
+    // 点击“挑战”
+    "挑战开拓征程-关卡": {
+        "recognition": "OCR",
+        "expected": "挑战",
+        "threshold": 0.7,
+        "roi": [1005, 584, 88, 37],
+        "action": "Click",
+        "post_delay": 1500,
+        "next": ["挑战开拓征程_点击开始"]
+    },
+"挑战开拓征程_点击开始": {
+        "recognition": "OCR",
+        "expected": "开始",
+        "threshold": 0.7,
+        "roi":[1145, 542, 74, 56], // 限定开始按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 6000,
+        "next": [
+            "挑战开拓征程_点击手动"
+        ]
+    },
+    // 点击“手动”进入战斗
+    "挑战开拓征程_点击手动": {
+        "recognition": "OCR",
+        "expected": "手动",
+        "threshold": 0.7,
+        "roi": [79, 8, 127, 52],
+        "action": "Click",
+        "post_delay": 5000,
+        "next": ["战斗状态监控"]
+    },
+
+    // ----- 核心：战斗状态监控（循环检测胜利/失败）-----
+    "战斗状态监控": {
+        "recognition": "DirectHit",   // 不识别，只是作为循环容器
+        "action": "DoNothing",
+        "rate_limit": 2000,           // 每2秒检测一次
+        "timeout": 600000,            // 最长等待10分钟
+        "next": [
+            "胜利检测",               // 先检测胜利
+            "失败检测"                // 再检测失败
+        ]
+    },
+
+    // 胜利检测（模板匹配）
+    "胜利检测": {
+        "recognition": "TemplateMatch",
+        "template": "战斗结束.png",
+        "threshold": 0.7,
+        "roi": [1161, 4, 107, 321],
+        "action": "DoNothing",        // 只识别，不操作
+        "next": [
+            "挑战开拓征程_点击返回图片"
+        ]
+    },
+
+    // 失败检测（OCR）
+    "失败检测": {
+        "recognition": "OCR",
+        "expected": "战斗失败",
+        "threshold": 0.7,
+        "roi": [432, 309, 147, 46],
+        "action": "StopTask",         // 停止整个任务
+        "next": []
+    },
+
+    // ----- 返回处理（支持有奖励/无奖励）-----
+    "挑战开拓征程_点击返回图片": {
+        "recognition": "TemplateMatch",
+        "template": "返回.png",
+        "threshold": 0.8,
+        "roi": [1159, 596, 105, 97],
+        "action": "Click",
+        "post_delay": 1500,
+        "timeout": 3000,                // 3秒内找不到返回则直接进入下一关（容错）
+        "on_error": ["回到循环起点"],   // 没找到返回，直接下一关
+        "next": ["挑战开拓征程_检查返回残留"]
+    },
+
+    "挑战开拓征程_检查返回残留": {
+        "recognition": "TemplateMatch",
+        "template": "返回.png",
+        "threshold": 0.8,
+        "roi": [1159, 596, 105, 97],
+        "action": "DoNothing",
+        "timeout": 1000,                // 1秒内快速扫描
+        "on_error": ["回到循环起点"],   // 没有残留 → 直接下一关
+        "next": ["挑战开拓征程_再点一次返回"]  // 有残留 → 再点一次
+    },
+
+    "挑战开拓征程_再点一次返回": {
+        "recognition": "DirectHit",     // 直接执行动作，无需识别
+        "action": "Click",
+        "target": [1159, 596, 105, 97], // 固定点击返回区域
+        "post_delay": 1500,
+        "next": ["回到循环起点"]
+    },
+
+    // 回到循环起点
+    "回到循环起点": {
+        "recognition": "DirectHit",
+        "action": "DoNothing",
+        "next": ["挑战开拓征程-关卡"]
+},
     "关闭游戏": {
         "action": "Command",
         "exec": "taskkill",
