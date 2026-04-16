@@ -9,7 +9,7 @@
         "recognition": "TemplateMatch",
         "template": "关闭.png",
         "action": "Click",
-        "post_delay": 500,
+        "post_delay": 3000,
         "next": [
             "点击进入游戏"
         ]
@@ -18,10 +18,18 @@
         "recognition": "TemplateMatch",
         "template": "进入游戏.png",
         "action": "Click",
-        "post_delay": 3000,      // 点击后等待2.5秒，给游戏加载留出时间
+        "post_delay": 5000,      // 点击后等待2.5秒，给游戏加载留出时间
         "next": [
-            "关闭签到"
+            "点击签到奖励返回"
         ]
+    },
+    "点击签到奖励返回": {
+        "recognition": "TemplateMatch",
+        "template": "返回.png",
+        "roi": [1148, 593, 129, 117],
+        "action": "Click",
+        "post_delay": 2000,
+        "next": ["关闭签到"]
     },
     "关闭签到": {
         "recognition": "TemplateMatch",
@@ -2223,6 +2231,183 @@
         "action": "DoNothing",
         "next": ["挑战开拓征程-关卡"]
 },
+ "领取远航奖励": {
+        "recognition": "OCR",
+        "expected": "远航",
+        "roi":[894, 620, 65, 69], // 限定远航按钮区域，避免误点其他按钮
+        "action": "Click",
+        "post_delay": 2000, // 等待界面加载
+        "next": [
+            "点击全部收获1"
+        ]
+    },
+    "点击全部收获1": {
+        "recognition": "OCR",
+        "expected": "全部收获",
+        "roi":[794, 631, 209, 61], // 限定全部收获按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
+            "点击图片返回1"]
+            },
+     "点击图片返回1": {
+        "recognition": "TemplateMatch",
+        "template": "返回.png", // 请确保此图片存在且与界面匹配
+        "roi":[1184, 604, 73, 72], // 限定返回按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 2000, // 点击后等待界面响应
+    "next": ["点击领取远航日常"]
+},
+"点击领取远航日常": {
+        "recognition": "TemplateMatch",
+        "template": "远航日常.png",
+        "roi": [237, 612, 82, 81],
+        "action": "Click",
+        "post_delay": 1500,
+        "next": ["点击文字领取1"]
+    },
+    "点击文字领取1": {
+        "recognition": "OCR",
+        "expected": "领取",
+        "action": "Click",
+        "post_delay": 800,
+        "next": ["点击日常返回1"]
+    },
+    "点击日常返回1": {
+        "recognition": "TemplateMatch",
+        "template": "返回.png",
+        "roi": [1148, 593, 129, 117],
+        "action": "Click",
+        "post_delay": 500,
+        "next": ["返回远航"]
+    },
+    "返回远航":{
+        "action": "Click",
+        "target":[44, 378, 34, 34], // 固定位置点击，避免识别失败无法点击
+        "post_delay": 500,
+        "timeout": 3000,
+        "next": []
+    },
+    "星辰试炼清体力_开始": {
+        "action": "DoNothing",
+        "next": [
+            "星辰试炼清体力_点击星辰试炼",
+            "星辰试炼清体力_点击出航"
+        ]
+    },
+    // 点击“星辰试炼”文字（主目标）
+    "星辰试炼清体力_点击星辰试炼": {
+        "recognition": "OCR",
+        "expected": "星辰试炼",
+        "threshold": 0.7,
+        "roi":[1044, 529, 83, 30], // 限定星辰试炼按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "星辰试炼清体力_随机选择123"
+        ]
+    },
+    // 点击“出航”文字（当星辰试炼未出现时）
+    "星辰试炼清体力_点击出航": {
+        "recognition": "OCR",
+        "expected": "出航",
+        "threshold": 0.7,
+        "roi":[1017, 629, 107, 57], // 限定出航按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "星辰试炼清体力_点击交错世界"
+        ]
+    },
+    // 点击“交错的世界”文字
+    "星辰试炼清体力_点击交错世界": {
+        "recognition": "OCR",
+        "expected": "交错的世界",
+        "threshold": 0.7,
+        "roi":[180, 484, 187, 63], // 限定交错的世界按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 1500,
+        // 回到开始，再次检测星辰试炼（循环直到成功）
+        "next": [
+            "星辰试炼清体力_开始"
+        ]
+    },
+    // 在指定区域内识别“高额”并随机点击一个结果
+    "星辰试炼清体力_随机选择123": {
+        "recognition": "OCR",
+        "roi": [263, 520, 742, 47], // 用户指定的区域
+        "expected": "星辰试炼",
+        "order_by": "Random", // 随机排序
+        "index": 0, // 取随机后的第一个
+        "action": "Click",        
+        "post_delay": 1500,
+        "next": [
+            "星辰试炼清体力_点击代行","星辰试炼清体力_点击确认"
+        ]
+    },
+    // 点击“代行”文字
+    "星辰试炼清体力_点击代行": {
+        "recognition": "OCR",
+        "expected": "代行",
+        "roi": [847, 617, 48, 28],
+        "threshold": 0.7,
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "星辰试炼清体力_点击继续代行"
+        ]
+    },
+    // 点击“继续代行”文字
+    "星辰试炼清体力_点击继续代行": {
+        "recognition": "OCR",
+        "expected": "继续代行",
+        "threshold": 0.7,
+        "roi":[647, 469, 135, 40], // 限定继续代行按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "星辰试炼清体力_点击确认","星辰试炼清体力_循环返回"
+        ]
+    },
+    // 点击“确认”文字
+    "星辰试炼清体力_点击确认": {
+        "recognition": "OCR",
+        "expected": "确认",
+        "threshold": 0.7,
+        "roi":[954, 643, 81, 29], // 限定确认按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "点击星辰试炼返回图片清体力"
+        ]
+    },
+    "点击星辰试炼返回图片清体力": {
+        "recognition": "TemplateMatch",
+        "template": "返回.png", // 返回按钮图片
+        "threshold": 0.8,
+        "roi":[1159, 596, 105, 97], // 限定返回按钮区域，避免误点其他位置
+        "action": "Click",
+        "post_delay": 1500,
+        "next": [
+            "星辰试炼清体力_点击代行"
+        ]
+    },
+    "星辰试炼清体力_循环返回": {
+        "recognition": "DirectHit",
+        "target": [
+            149,
+            11,
+            59,
+            43
+        ], // 在指定矩形区域内随机点击 
+        "action": "Click",
+        "repeat": 3,
+        "repeat_delay": 2000,
+        "post_delay": 2000,
+        "timeout": 3000,
+        // 超时即回到主界面，结束脚本
+        "next": []
+    },
     "关闭游戏": {
         "action": "Command",
         "exec": "taskkill",
