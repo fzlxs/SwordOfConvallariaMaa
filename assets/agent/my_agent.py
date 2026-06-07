@@ -1,20 +1,40 @@
+import sys
+import json
 from maa.agent.agent_server import AgentServer
+from maa.custom_action import CustomAction
+from maa.context import Context
 
 @AgentServer.custom_action("execute_sequential")
-def execute_sequential(context):
-    # 1. 从任务配置里，获取要执行的任务清单
-    # 我们在Pipeline里写的 {"tasks": ["任务A", "任务B"]} 会通过这行被读取进来
-    task_list = context.param.get("tasks", [])
-    
-    # 2. 按顺序一个一个执行这些任务
-    for task_name in task_list:
-        # context.run_task 会执行对应的Pipeline节点，并等待它完成
-        ret = context.run_task(task_name)
-        # 可选的错误处理：如果某个任务失败了，可以在这里加个简单的提示
-        if not ret:
-            print(f"任务执行失败: {task_name}")
-            # 你也可以在这里决定是继续还是中断整个流程
-            # return False
-    
-    # 3. 任务全部完成，返回成功
-    return True
+class ExecuteSequential(CustomAction):
+    def run(
+        self,
+        context: Context,
+        argv: CustomAction.RunArg,
+    ) -> CustomAction.RunResult:
+        # 1. 获取你在 pipeline 中传入的任务列表
+        task_list = json.loads(argv.custom_action_param).get("tasks", [])
+
+        # 2. 按顺序执行它们
+        for task_name in task_list:
+            ret = context.run_task(task_name)
+            if not ret:
+                print(f"任务执行失败: {task_name}")
+                # 如果想让一个任务失败后停止，可以在这里取消注释下一行
+                # return CustomAction.RunResult(success=False)
+
+        # 3. 所有任务执行完毕，通知框架动作成功
+        return CustomAction.RunResult(success=True)
+
+if __name__ == "__main__":
+    # 接收从UI传来的 socket_id
+    # UI 会以 "python my_agent.py <socket_id>" 的形式启动你的脚本
+    socket_id = sys.argv[1] if len(sys.argv) > 1 else None
+
+    if socket_id is None:
+        print("错误：必须提供一个 socket_id 作为命令行参数")
+        sys.exit(1)
+
+    # 用获取到的 socket_id 启动 Agent 服务器
+    print(f"正在使用 socket {socket_id} 启动 Agent 服务器...")
+    AgentServer.start_up(socket_id)      # <--- 这里传入 socket_id
+    AgentServer.join()
