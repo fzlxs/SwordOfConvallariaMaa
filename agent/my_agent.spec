@@ -5,7 +5,7 @@ a = Analysis(
     ['my_agent.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\maa\\bin', 'maa/bin')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
