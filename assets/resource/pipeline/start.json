@@ -8,6 +8,7 @@
     "进入任务界面": {
         "recognition": "TemplateMatch",
         "template": "每日任务.png",   // 大厅里的任务按钮
+        "post_delay":5000,
         "action": "Click",
         "next": ["判断未完成", "判断已完成"]
     },
@@ -53,7 +54,7 @@
     "next": []
 },
     "启动游戏": {
-        "post_delay": 10000, // 启动后等待5秒，给游戏加载留出时间
+        "post_delay": 50000, // 启动后等待5秒，给游戏加载留出时间
         "next": [
             "处理关闭",
             "点击进入游戏"
@@ -171,7 +172,7 @@
 },
 "点击确定派遣": {
     "recognition": "OCR",
-    "expected": "确定派遣",
+    "expected": "确定",
     "roi":[750, 471, 116, 39], // 限定确定派遣按钮区域，避免误点其他位置
     "action": "Click",
     "post_delay": 5000,
