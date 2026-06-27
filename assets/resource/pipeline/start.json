@@ -167,13 +167,14 @@
         "next": []
     },
     "点击文字远航": {
-        "recognition": "OCR",
-        "expected": "远航",
+        "recognition": "TemplateMatch",
+        "template": "远航.png",
+        "threshold": 0.8,
         "roi": [
-            894,
-            620,
-            65,
-            69
+            890,
+            599,
+            73,
+            96
         ], // 限定远航按钮区域，避免误点其他按钮
         "action": "Click",
         "post_delay": 5000, // 等待界面加载
