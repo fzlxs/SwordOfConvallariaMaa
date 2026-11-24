@@ -1,5 +1,12 @@
 name: install
 
+env:
+  # 固定 MaaFramework 版本，让打出来的包可复现。
+  # ⚠️ agent/my_agent.exe 里内嵌的 MaaFw 版本必须与这里一致，否则会出现
+  #    "Protocol version mismatch ... Please update AgentServer"（agent 连不上）。
+  #    改这个版本号时，请同步按 agent/README_BUILD.md 重新打包 exe。
+  MAAFW_VERSION: v5.16.1
+
 on:
   push:
     tags:
@@ -79,7 +86,7 @@ jobs:
         with:
           repository: MaaXYZ/MaaFramework
           fileName: "MAA-${{ matrix.os }}-${{ matrix.arch }}*"
-          latest: true
+          tag: ${{ env.MAAFW_VERSION }}
           out-file-path: "deps"
           extract: true
 

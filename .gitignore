@@ -35,6 +35,10 @@ build-*
 # Executables
 *.exe
 !agent/my_agent.exe
+
+# agent 打包产物 / 虚拟环境（重新打包见 agent/README_BUILD.md）
+agent/.buildenv/
+agent/dist/
 *.out
 *.app
 
